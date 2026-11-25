@@ -80,6 +80,7 @@ class Style:
         "_link",
         "_link_id",
         "_ansi",
+        "_ansi_color_system",
         "_style_definition",
         "_hash",
         "_null",
@@ -150,6 +151,7 @@ class Style:
         meta: dict[str, Any] | None = None,
     ):
         self._ansi: str | None = None
+        self._ansi_color_system: ColorSystem | None = None
         self._style_definition: str | None = None
 
         def _make_color(color: Color | str) -> Color:
@@ -221,6 +223,7 @@ class Style:
         """
         style: Style = cls.__new__(Style)
         style._ansi = None
+        style._ansi_color_system = None
         style._style_definition = None
         style._color = color
         style._bgcolor = bgcolor
@@ -242,6 +245,7 @@ class Style:
         """
         style: Style = cls.__new__(Style)
         style._ansi = None
+        style._ansi_color_system = None
         style._style_definition = None
         style._color = None
         style._bgcolor = None
@@ -351,7 +355,7 @@ class Style:
             str: String containing codes.
         """
 
-        if self._ansi is None:
+        if self._ansi is None or self._ansi_color_system != color_system:
             sgr: list[str] = []
             append = sgr.append
             _style_map = self._style_map
@@ -382,6 +386,7 @@ class Style:
                     )
                 )
             self._ansi = ";".join(sgr)
+            self._ansi_color_system = color_system
         return self._ansi
 
     @classmethod
@@ -481,6 +486,7 @@ class Style:
             return NULL_STYLE
         style: Style = self.__new__(Style)
         style._ansi = None
+        style._ansi_color_system = None
         style._style_definition = None
         style._color = None
         style._bgcolor = None
@@ -633,6 +639,7 @@ class Style:
             return NULL_STYLE
         style: Style = self.__new__(Style)
         style._ansi = self._ansi
+        style._ansi_color_system = self._ansi_color_system
         style._style_definition = self._style_definition
         style._color = self._color
         style._bgcolor = self._bgcolor
@@ -656,6 +663,7 @@ class Style:
             return NULL_STYLE
         style: Style = self.__new__(Style)
         style._ansi = self._ansi
+        style._ansi_color_system = self._ansi_color_system
         style._style_definition = self._style_definition
         style._color = self._color
         style._bgcolor = self._bgcolor
@@ -679,6 +687,7 @@ class Style:
         """
         style: Style = self.__new__(Style)
         style._ansi = self._ansi
+        style._ansi_color_system = self._ansi_color_system
         style._style_definition = self._style_definition
         style._color = self._color
         style._bgcolor = self._bgcolor
@@ -709,7 +718,7 @@ class Style:
         """
         if not text or color_system is None:
             return text
-        attrs = self._ansi or self._make_ansi_codes(color_system)
+        attrs = self._make_ansi_codes(color_system)
         rendered = f"\x1b[{attrs}m{text}\x1b[0m" if attrs else text
         if self._link and not legacy_windows:
             rendered = (
@@ -737,6 +746,7 @@ class Style:
             return style
         new_style: Style = self.__new__(Style)
         new_style._ansi = None
+        new_style._ansi_color_system = None
         new_style._style_definition = None
         new_style._color = style._color or self._color
         new_style._bgcolor = style._bgcolor or self._bgcolor

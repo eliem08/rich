@@ -18,6 +18,7 @@ The following people have contributed to the development of Rich:
 - [James Estevez](https://github.com/jstvz)
 - [Jonathan Eunice](https://github.com/jonathan-3play)
 - [Aryaz Eghbali](https://github.com/AryazE)
+- [Ilyass Emssaad](https://github.com/eliem08)
 - [Oleksis Fraga](https://github.com/oleksis)
 - [Andy Gimblett](https://github.com/gimbo)
 - [Kai Giokas](https://github.com/kaisforza)

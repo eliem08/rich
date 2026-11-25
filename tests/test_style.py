@@ -1,7 +1,9 @@
+import io
 import pytest
 
 from rich import errors
 from rich.color import Color, ColorSystem, ColorType
+from rich.console import Console
 from rich.style import Style, StyleStack
 
 
@@ -265,3 +267,47 @@ def test_clear_meta_and_links_clears_hash():
 
     clear_style = style.clear_meta_and_links()
     assert clear_style._hash is None
+
+
+def test_make_ansi_codes_color_system():
+    """Regression test for https://github.com/Textualize/rich/issues/4261."""
+    style = Style(color="#ff8800")
+    assert style._make_ansi_codes(ColorSystem.TRUECOLOR) == "38;2;255;136;0"
+    assert style._make_ansi_codes(ColorSystem.STANDARD) == "91"
+    assert style._make_ansi_codes(ColorSystem.EIGHT_BIT) == "38;5;208"
+    # The cache must not pin the first color system it rendered with.
+    assert style._make_ansi_codes(ColorSystem.TRUECOLOR) == "38;2;255;136;0"
+
+
+def test_render_color_system():
+    """Regression test for https://github.com/Textualize/rich/issues/4261."""
+    style = Style.parse("#ff8800")
+    assert (
+        style.render("orange", color_system=ColorSystem.TRUECOLOR)
+        == "\x1b[38;2;255;136;0morange\x1b[0m"
+    )
+    assert (
+        style.render("orange", color_system=ColorSystem.STANDARD)
+        == "\x1b[91morange\x1b[0m"
+    )
+    assert (
+        style.render("orange", color_system=ColorSystem.EIGHT_BIT)
+        == "\x1b[38;5;208morange\x1b[0m"
+    )
+
+
+def test_console_color_systems():
+    """The same markup renders with each console's own color system.
+
+    Regression test for https://github.com/Textualize/rich/issues/4261.
+    """
+    outputs = {}
+    for color_system in ("truecolor", "standard", "256"):
+        console = Console(
+            file=io.StringIO(), color_system=color_system, force_terminal=True
+        )
+        console.print("[#ff8800]orange[/]", end="")
+        outputs[color_system] = console.file.getvalue()
+    assert outputs["truecolor"] == "\x1b[38;2;255;136;0morange\x1b[0m"
+    assert outputs["standard"] == "\x1b[91morange\x1b[0m"
+    assert outputs["256"] == "\x1b[38;5;208morange\x1b[0m"

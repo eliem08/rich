@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for Python 3.15
 - Switched from Poetry to uv for packaging and development
 
+### Fixed
+
+- Fixed `Style` caching ANSI codes for the first color system it was rendered with, so the same style now renders with the correct codes on consoles with different color systems https://github.com/Textualize/rich/issues/4261
+
 ## [15.0.0] - 2026-04-12
 
 ### Changed
